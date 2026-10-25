@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="DayFlow"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#6c4cf1">
+<title>DayFlow – Daily Planner</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+--bg:#f4f3fb;--card:#fff;--tx:#1d1b2e;--mu:#6b6880;--ac:#6c4cf1;--ac2:#ebe7ff;--bd:#e3e0f0;--ok:#1f9d63;--act:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12111c;--card:#1c1a2b;--tx:#efeefa;--mu:#9b98b4;--ac:#8b72ff;--ac2:#2a2545;--bd:#2c2942;--ok:#3ecf8e;--act:#12111c}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12111c;--card:#1c1a2b;--tx:#efeefa;--mu:#9b98b4;--ac:#8b72ff;--ac2:#2a2545;--bd:#2c2942;--ok:#3ecf8e;--act:#12111c}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}.logo span{color:var(--ac)}
+#clock{color:var(--mu);font-size:14px;text-align:right}
+nav{display:flex;gap:6px;background:var(--card);border:1px solid var(--bd);padding:5px;border-radius:14px;margin-bottom:16px}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:10px 4px;border-radius:10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+nav button.on{background:var(--ac);color:var(--act)}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 4px;font-size:22px}h3{margin:0 0 10px;font-size:16px}.mu{color:var(--mu);font-size:14px}
+.bar{height:8px;background:var(--ac2);border-radius:99px;overflow:hidden;margin:10px 0 2px}.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.task{display:flex;align-items:center;gap:12px;padding:12px 4px;border-top:1px solid var(--bd)}
+.task:first-child{border-top:0}
+.task input{width:22px;height:22px;accent-color:var(--ok);flex:none;cursor:pointer}
+.task .t{font-weight:700;color:var(--ac);min-width:76px;font-variant-numeric:tabular-nums}
+.task.done .x{text-decoration:line-through;color:var(--mu)}.task .x{flex:1;word-break:break-word}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+input[type=text],input[type=time]{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font:inherit}
+input[type=text]{flex:1;min-width:140px}
+.btn{background:var(--ac);color:var(--act);border:0;border-radius:10px;padding:10px 16px;font:600 15px inherit;font-family:inherit;cursor:pointer}
+.ghost{background:none;border:0;color:var(--mu);cursor:pointer;font-size:18px;padding:4px 8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--bd);background:var(--bg);color:var(--mu);border-radius:99px;padding:6px 12px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.chip.on{background:var(--ac);color:var(--act);border-color:var(--ac)}
+.mini{display:flex;gap:3px;margin-top:4px}.mini b{font-size:11px;border-radius:6px;padding:1px 5px;background:var(--bg);color:var(--mu);cursor:pointer;border:1px solid var(--bd)}.mini b.on{background:var(--ac2);color:var(--ac);border-color:var(--ac)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .h{font-size:12px;color:var(--mu);font-weight:600;padding:4px 0}
+.cal button{aspect-ratio:1;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;cursor:pointer;font:600 14px inherit;font-family:inherit;position:relative;padding:0}
+.cal button.td{border-color:var(--ac);color:var(--ac)}.cal button.sel{background:var(--ac);color:var(--act)}
+.cal button i{position:absolute;bottom:5px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--ok)}
+.cal .e{visibility:hidden}
+.cn{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ev{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}.ev:first-child{border-top:0}.ev .t{color:var(--ac);font-weight:700;min-width:76px}.ev .x{flex:1}
+.hd{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.hi{font-size:15px;padding:3px 0}.hi.d{color:var(--ok)}.hi.n{color:var(--mu)}
+.empty{color:var(--mu);text-align:center;padding:18px 0;font-size:15px}
+.tw{border-top:1px solid var(--bd)}.tw:first-child{border-top:0}.trow{display:flex;align-items:center}.trow .task{flex:1;border-top:0}
+.tg{font-size:13px;color:var(--ac);font-weight:600;white-space:nowrap}
+html{-webkit-text-size-adjust:100%}button,input,label{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+input[type=text],input[type=time]{min-height:44px}.chip{min-height:36px}.ghost{min-width:40px;min-height:40px}
+textarea{width:100%;min-height:110px;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:10px;font:13px ui-monospace,Menlo,monospace}
+.subs{padding:0 0 10px 34px}.sub{display:flex;gap:10px;align-items:center;padding:6px 0;cursor:pointer}.sub input{width:20px;height:20px;accent-color:var(--ok);flex:none}.sub.done span{text-decoration:line-through;color:var(--mu)}
+</style></head><body><div class="wrap">
+<header><div class="logo">Day<span>Flow</span></div><div id="clock"></div></header>
+<nav id="nav"><button data-t="today" class="on">Today</button><button data-t="sched">Schedules</button><button data-t="cal">Calendar</button><button data-t="hist">History</button></nav>
+
+<section id="today" class="on">
+ <div class="card"><h2 id="tTitle"></h2><div class="mu" id="tSub"></div><div class="bar"><i id="tBar"></i></div></div>
+ <div class="card"><h3>Today’s checklist</h3><div id="tList"></div></div>
+ <div class="card" id="tEvCard"><h3>Today’s events</h3><div id="tEv"></div></div>
+</section>
+
+<section id="sched">
+ <div class="card"><h3>Create a new schedule</h3><div class="mu" style="margin-bottom:10px">Build the whole schedule first, then choose which days it applies to.</div>
+  <div class="row" style="margin:0"><input type="text" id="nName" placeholder="Schedule name (e.g. School day)" maxlength="40"><button class="btn" id="nAdd">Create</button></div></div>
+ <div id="sList"></div>
+ <div class="card"><h3>Backup</h3><div class="mu" style="margin-bottom:10px">Your data is saved in this browser only. Tap Export to get a backup, then paste it on another device or website address and tap Import.</div>
+  <textarea id="bk" placeholder="Backup text appears here. To restore, paste it here and tap Import." spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+  <div class="row" style="margin:10px 0 0"><button class="btn" id="bkE">Export</button><button class="btn" id="bkI" style="background:var(--ac2);color:var(--ac)">Import</button></div><div class="mu" id="bkM" style="margin-top:8px"></div></div>
+</section>
+
+<section id="cal">
+ <div class="card"><div class="cn"><button class="ghost" id="pM">‹</button><h3 id="mT" style="margin:0"></h3><button class="ghost" id="nM">›</button></div><div class="cal" id="grid"></div></div>
+ <div class="card"><h3 id="sdT"></h3><div id="evList"></div>
+  <div class="row" style="margin:12px 0 0"><input type="time" id="eTime" value="12:00"><input type="text" id="eText" placeholder="New event" maxlength="80"><button class="btn" id="eAdd">Add</button></div></div>
+</section>
+
+<section id="hist"><div id="hList"></div></section>
+</div>
+<script>
+const KEY='dayflow.v1',DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S||{log:{},snaps:{},events:[]};S.schedules=S.schedules||[];
+if(S.tasks&&S.tasks.length){const g={};S.tasks.forEach(t=>{const k=t.days.join();(g[k]=g[k]||{id:'m'+k.replace(/,/g,''),name:'Imported ('+t.days.map(i=>DN[i]).join(', ')+')',days:t.days,items:[]}).items.push({id:t.id,time:t.time,text:t.text})});S.schedules.push(...Object.values(g))}delete S.tasks;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const ds=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const lnow=()=>new Date(Date.now()-30*60000); // new day starts at 12:30 AM
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const f12=t=>{let[h,m]=t.split(':').map(Number);return(h%12||12)+':'+pad(m)+' '+(h<12?'AM':'PM')};
+const byT=(a,b)=>a.time.localeCompare(b.time);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const long=d=>d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+let cy,cm,sel,last=ds(lnow()),open={},sopen={};
+{const n=lnow();cy=n.getFullYear();cm=n.getMonth();sel=ds(n)}
+
+function chips(el,cls,on,cb,all){el.innerHTML=DN.map((d,i)=>'<button class="chip'+(on(i)?' on':'')+'" data-i="'+i+'">'+d+'</button>').join('');
+ el.onclick=e=>{const b=e.target.closest('button');if(b){cb(+b.dataset.i);chips(el,cls,on,cb)}}}
+function drawChips(){}
+function renderToday(){
+ const n=lnow(),today=ds(n),wd=n.getDay();
+ const list=S.schedules.filter(s=>s.days.includes(wd)).flatMap(s=>s.items).sort(byT);
+ S.snaps[today]=list.map(({id,time,text})=>({id,time,text}));
+ const dn=S.log[today]||{};const done=list.filter(t=>dn[t.id]).length;
+ $('tTitle').textContent=long(n);
+ $('tSub').textContent=list.length?done+' of '+list.length+' done'+(done===list.length?' – nice work! 🎉':''):'Nothing scheduled today';
+ $('tBar').style.width=(list.length?done/list.length*100:0)+'%';
+ $('tList').innerHTML=list.length?list.map(t=>{const sb=t.subs||[],c=sb.filter(b=>dn[b.id]).length;return '<div class="tw"><div class="trow"><label class="task'+(dn[t.id]?' done':'')+'"><input type="checkbox" data-id="'+t.id+'"'+(dn[t.id]?' checked':'')+'><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span></label>'+(sb.length?'<button class="ghost tg" data-tg="'+t.id+'">'+c+'/'+sb.length+' '+(open[t.id]?'▴':'▾')+'</button>':'')+'</div>'+(sb.length&&open[t.id]?'<div class="subs">'+sb.map(b=>'<label class="sub'+(dn[b.id]?' done':'')+'"><input type="checkbox" data-id="'+b.id+'"'+(dn[b.id]?' checked':'')+'><span>'+esc(b.text)+'</span></label>').join('')+'</div>':'')+'</div>'}).join(''):'<div class="empty">No schedule is assigned to today. Create one in the Schedules tab and pick this day.</div>';
+ const ev=S.events.filter(e=>e.date===today).sort(byT);
+ $('tEvCard').style.display=ev.length?'block':'none';
+ $('tEv').innerHTML=ev.map(e=>'<div class="ev"><span class="t">'+f12(e.time)+'</span><span class="x">'+esc(e.title)+'</span></div>').join('');
+ save();
+}
+const srow=(s,t)=>{const o=sopen[t.id],n=(t.subs||[]).length;return '<div class="tw"><div class="task"><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span><button class="ghost tg" data-sg="'+t.id+'">'+(n?n+' steps ':'steps ')+(o?'▴':'▾')+'</button><button class="ghost" data-i="'+t.id+'" data-s="'+s.id+'" aria-label="Delete task">✕</button></div>'+(o?'<div class="subs">'+(t.subs||[]).map(b=>'<div class="sub" style="cursor:default"><span style="flex:1">'+esc(b.text)+'</span><button class="ghost" data-bi="'+b.id+'" data-s="'+s.id+'" data-t="'+t.id+'" aria-label="Delete step">✕</button></div>').join('')+'<div class="row" style="margin:6px 0 0"><input type="text" placeholder="Add a step (e.g. drink water)" maxlength="60" data-bx="'+t.id+'"><button class="btn" data-ba="'+t.id+'">Add</button></div></div>':'')+'</div>'};
+function renderSched(){
+ $('sList').innerHTML=S.schedules.length?S.schedules.map(s=>'<div class="card"><div class="hd" style="cursor:default"><h3 style="margin:0">'+esc(s.name)+'</h3><button class="ghost" data-dels="'+s.id+'" aria-label="Delete schedule">🗑</button></div>'+
+ '<div class="mu" style="margin:10px 0 6px">Applies to</div><div class="chips">'+DN.map((d,i)=>'<button class="chip'+(s.days.includes(i)?' on':'')+'" data-s="'+s.id+'" data-d="'+i+'">'+d+'</button>').join('')+'</div>'+
+ (s.items.length?s.items.slice().sort(byT).map(t=>srow(s,t)).join(''):'<div class="mu" style="padding:8px 0">No tasks yet.</div>')+
+ '<div class="row" style="margin:10px 0 0"><input type="time" value="09:00" data-ti="'+s.id+'"><input type="text" placeholder="Add a task" maxlength="80" data-tx="'+s.id+'"><button class="btn" data-add="'+s.id+'">Add</button></div></div>').join(''):'<div class="card empty">No schedules yet. Create one above.</div>';
+}
+function renderSchedOld(){
+ chips($('fDays'),'',i=>fDay===i,i=>{fDay=i;renderSched()});
+ const l=S.tasks.filter(t=>t.days.includes(fDay)).sort(byT);
+ $('sList').innerHTML=l.length?l.map(t=>'<div class="task"><span class="t">'+f12(t.time)+'</span><div class="x">'+esc(t.text)+'<div class="mini">'+DN.map((d,i)=>'<b data-id="'+t.id+'" data-d="'+i+'" class="'+(t.days.includes(i)?'on':'')+'">'+d[0]+'</b>').join('')+'</div></div><button class="ghost" data-del="'+t.id+'" aria-label="Delete">✕</button></div>').join(''):'<div class="empty">Nothing scheduled for '+DN[fDay]+'.</div>';
+}
+function renderCal(){
+ $('mT').textContent=new Date(cy,cm,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+ const first=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate(),td=ds(lnow());
+ let h=DN.map(d=>'<div class="h">'+d[0]+'</div>').join('')+'<div class="e"></div>'.repeat(first);
+ for(let d=1;d<=dim;d++){const k=cy+'-'+pad(cm+1)+'-'+pad(d);h+='<button data-d="'+k+'" class="'+(k===td?'td ':'')+(k===sel?'sel':'')+'">'+d+(S.events.some(e=>e.date===k)?'<i></i>':'')+'</button>'}
+ $('grid').innerHTML=h;
+ $('sdT').textContent=new Date(sel+'T00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+ const ev=S.events.filter(e=>e.date===sel).sort(byT);
+ $('evList').innerHTML=ev.length?ev.map(e=>'<div class="ev"><span class="t">'+f12(e.time)+'</span><span class="x">'+esc(e.title)+'</span><button class="ghost" data-ev="'+e.id+'" aria-label="Delete">✕</button></div>').join(''):'<div class="mu">No events on this day.</div>';
+}
+function renderHist(){
+ const today=ds(lnow()),ds_=Object.keys(S.snaps).filter(k=>k<today&&S.snaps[k].length).sort().reverse();
+ $('hList').innerHTML=ds_.length?ds_.map(k=>{const s=S.snaps[k],dn=S.log[k]||{},c=s.filter(t=>dn[t.id]).length;
+  return '<div class="card"><div class="hd"><div><h3 style="margin:0">'+new Date(k+'T00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+'</h3><div class="mu">'+c+' of '+s.length+' completed</div></div><span style="font-size:22px">'+(c===s.length?'🏆':'')+'</span></div><div class="bar"><i style="width:'+c/s.length*100+'%"></i></div>'+
+  s.slice().sort(byT).map(t=>'<div class="hi '+(dn[t.id]?'d':'n')+'">'+(dn[t.id]?'✓ ':'○ ')+f12(t.time)+' · '+esc(t.text)+'</div>').join('')+'</div>'}).join(''):'<div class="card empty">Your previous days will show up here after the 12:30 AM reset.</div>';
+}
+const all=()=>{renderToday();renderSched();renderCal();renderHist();clock()};
+function clock(){const n=new Date();$('clock').innerHTML=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'<br>New day starts 12:30 AM'}
+
+$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$(b.dataset.t).classList.add('on');all()};
+$('tList').onclick=e=>{const b=e.target.closest('[data-tg]');if(b){open[b.dataset.tg]=!open[b.dataset.tg];renderToday()}};
+$('tList').onchange=e=>{const id=e.target.dataset.id;if(!id)return;const t=ds(lnow());S.log[t]=S.log[t]||{};S.log[t][id]=e.target.checked;save();renderToday()};
+const addSched=()=>{const n=$('nName').value.trim();if(!n){$('nName').focus();return}S.schedules.push({id:uid(),name:n,days:[],items:[]});$('nName').value='';save();all()};
+$('nAdd').onclick=addSched;$('nName').onkeydown=e=>{if(e.key==='Enter')addSched()};
+const addItem=id=>{const q=a=>document.querySelector('['+a+'="'+id+'"]'),tm=q('data-ti').value,tx=q('data-tx').value.trim(),s=S.schedules.find(x=>x.id===id);if(!tx||!tm){q('data-tx').focus();return}s.items.push({id:uid(),time:tm,text:tx});save();all();q('data-ti').value=tm;q('data-tx').focus()};
+$('sList').onclick=e=>{const b=e.target.closest('button');if(!b)return;const D=b.dataset,s=S.schedules.find(x=>x.id===(D.s||D.dels||D.add));
+ if(D.add)return addItem(D.add);
+ if(D.sg){sopen[D.sg]=!sopen[D.sg];return renderSched()}
+ if(D.ba)return addSub(D.ba);
+ if(D.bi){const t=s.items.find(x=>x.id===D.t);t.subs=t.subs.filter(x=>x.id!==D.bi);save();all();return}
+ if(D.dels)S.schedules=S.schedules.filter(x=>x.id!==D.dels);
+ else if(D.i)s.items=s.items.filter(t=>t.id!==D.i);
+ else if(D.d!==undefined)s.days=s.days.includes(+D.d)?s.days.filter(x=>x!==+D.d):[...s.days,+D.d].sort();
+ save();all()};
+const addSub=id=>{const q=()=>document.querySelector('[data-bx="'+id+'"]'),v=q().value.trim();if(!v){q().focus();return}for(const s of S.schedules){const t=s.items.find(x=>x.id===id);if(t){(t.subs=t.subs||[]).push({id:uid(),text:v});break}}save();all();q().focus()};
+$('sList').onkeydown=e=>{if(e.key!=='Enter')return;if(e.target.dataset.tx)addItem(e.target.dataset.tx);if(e.target.dataset.bx)addSub(e.target.dataset.bx)};
+$('pM').onclick=()=>{cm--;if(cm<0){cm=11;cy--}renderCal()};$('nM').onclick=()=>{cm++;if(cm>11){cm=0;cy++}renderCal()};
+$('grid').onclick=e=>{const b=e.target.closest('button');if(b){sel=b.dataset.d;renderCal()}};
+$('eAdd').onclick=()=>{const title=$('eText').value.trim();if(!title)return;S.events.push({id:uid(),date:sel,time:$('eTime').value||'12:00',title});$('eText').value='';save();all()};
+$('eText').onkeydown=e=>{if(e.key==='Enter')$('eAdd').click()};
+$('evList').onclick=e=>{const d=e.target.closest('[data-ev]');if(d){S.events=S.events.filter(x=>x.id!==d.dataset.ev);save();all()}};
+
+const bm=t=>{$('bkM').textContent=t};
+$('bkE').onclick=()=>{const j=JSON.stringify(S),b=$('bk');b.value=j;b.focus();b.setSelectionRange(0,j.length);bm('Backup ready. Copy the text above.');
+ try{navigator.clipboard.writeText(j).then(()=>bm('Copied to clipboard ✓'),()=>{})}catch(e){}
+ try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.download='dayflow-backup.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}};
+$('bkI').onclick=()=>{try{const d=JSON.parse($('bk').value.trim());if(!d||!Array.isArray(d.schedules))throw 0;
+ S={schedules:d.schedules,log:d.log||{},snaps:d.snaps||{},events:d.events||[]};save();all();$('bk').value='';bm('Imported ✓')}catch(e){bm('That does not look like a DayFlow backup. Paste the full exported text.')}};
+drawChips();all();
+setInterval(()=>{clock();const d=ds(lnow());if(d!==last){last=d;sel=d;all()}},15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const d=ds(lnow());if(d!==last){last=d;all()}clock()}});
+</script></body></html>
