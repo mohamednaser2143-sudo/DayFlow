@@ -71,6 +71,7 @@ body.lock .wrap{display:none}
 </style></head><body class="lock">
 <div id="splash"><div class="lg"><span>Day</span><span class="fl">Flow</span></div><div id="water"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30Q150 0 300 30T600 30T900 30T1200 30V60H0Z"/></svg></div></div>
 <div class="scr" id="auth"><div class="card"><div class="logo" style="margin-bottom:6px">Day<span>Flow</span></div><h2 id="aT" style="margin-bottom:12px"></h2><input type="text" id="aN" placeholder="Email" inputmode="email" autocapitalize="none" autocomplete="email" spellcheck="false"><input type="password" id="aP" placeholder="Password (6+ characters)" autocomplete="current-password"><div class="mu" id="aM" style="margin-bottom:10px"></div><button class="btn" id="aB"></button><div class="mu" id="aS" style="margin-top:12px;text-align:center;cursor:pointer"></div><div class="mu" id="aF" style="margin-top:10px;text-align:center;cursor:pointer">Forgot password?</div></div></div>
+<div class="scr" id="pinS"><div class="card"><h3 id="pT" style="margin-bottom:12px"></h3><input type="password" id="pI" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off"><div class="mu" id="pM" style="margin-bottom:10px"></div><button class="btn" id="pOk">OK</button><div class="mu" id="pCx" style="margin-top:12px;text-align:center;cursor:pointer">Cancel</div></div></div>
 <div class="scr" id="verse"><div class="card vc"><div class="mu">✦ Verse of the day ✦</div><div id="vAr" dir="rtl" lang="ar"></div><div id="vEn"></div><div class="mu" id="vRef" style="margin-bottom:16px"></div><button class="btn" id="vGo">Continue</button></div></div>
 <div class="wrap">
 <header><div class="logo">Day<span>Flow</span></div><div id="clock"></div></header>
@@ -89,6 +90,10 @@ body.lock .wrap{display:none}
  <div class="card"><h3>Backup</h3><div class="mu" style="margin-bottom:10px">Your data is saved in this browser only. Tap Export to get a backup, then paste it on another device or website address and tap Import.</div>
   <textarea id="bk" placeholder="Backup text appears here. To restore, paste it here and tap Import." spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
   <div class="row" style="margin:10px 0 0"><button class="btn" id="bkE">Export</button><button class="btn" id="bkI" style="background:var(--ac2);color:var(--ac)">Import</button><button class="btn" id="bkO" style="background:var(--ac2);color:var(--ac)">Sign out</button></div><div class="mu" id="bkM" style="margin-top:8px"></div></div>
+ <div class="card"><h3>Account</h3><div class="mu" id="acE" style="margin-bottom:10px"></div>
+  <input type="password" id="acP" placeholder="Current password" autocomplete="current-password" style="width:100%;margin-bottom:8px">
+  <input type="password" id="acN" placeholder="New password (6+ characters)" autocomplete="new-password" style="width:100%;margin-bottom:10px">
+  <div class="row" style="margin:0"><button class="btn" id="acC">Change password</button><button class="btn" id="acD" style="background:#d64545;color:#fff">Delete account</button></div><div class="mu" id="acM" style="margin-top:8px"></div></div>
 </section>
 
 <section id="cal">
@@ -99,8 +104,8 @@ body.lock .wrap{display:none}
 
 <section id="hist"><div id="hList"></div></section>
 
-<section id="notes"><div id="nLst"></div>
- <div class="card" id="nEd" style="display:none"><div class="row" style="margin:0 0 10px"><button class="ghost" id="nBk">‹ Back</button><button class="ghost" id="nDl" style="margin-left:auto">🗑</button></div><input type="text" id="nTi" placeholder="Note name" maxlength="60" style="width:100%;margin-bottom:10px"><textarea id="nBd" placeholder="Write here..." style="min-height:300px"></textarea></div></section>
+<section id="notes"><input type="text" id="nQ" placeholder="Search notes" style="width:100%;margin-bottom:12px"><div id="nLst"></div>
+ <div class="card" id="nEd" style="display:none"><div class="row" style="margin:0 0 10px"><button class="ghost" id="nBk">‹ Back</button><button class="ghost" id="nPn" style="margin-left:auto" aria-label="Pin note">📌</button><button class="ghost" id="nLk" aria-label="Lock note">🔒</button><button class="ghost" id="nDl">🗑</button></div><input type="text" id="nTi" placeholder="Note name" maxlength="60" style="width:100%;margin-bottom:10px"><textarea id="nBd" placeholder="Write here..." style="min-height:300px"></textarea></div></section>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.13.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.13.2/firebase-auth-compat.min.js"></script>
@@ -167,7 +172,7 @@ function renderHist(){
   return '<div class="card"><div class="hd"><div><h3 style="margin:0">'+new Date(k+'T00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})+'</h3><div class="mu">'+c+' of '+s.length+' completed</div></div><span style="font-size:22px">'+(c===s.length?'🏆':'')+'</span></div><div class="bar"><i style="width:'+c/s.length*100+'%"></i></div>'+
   s.slice().sort(byT).map(t=>'<div class="hi '+(dn[t.id]?'d':'n')+'">'+(dn[t.id]?'✓ ':'○ ')+f12(t.time)+' · '+esc(t.text)+'</div>').join('')+'</div>'}).join(''):'<div class="card empty">Your previous days will show up here after the 12:30 AM reset.</div>';
 }
-const all=()=>{renderToday();renderSched();renderCal();renderHist();renderNotes();clock()};
+const all=()=>{renderToday();renderSched();renderCal();renderHist();renderNotes();acInfo();clock()};
 function clock(){const n=new Date();$('clock').innerHTML=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'<br>New day starts 12:30 AM'}
 
 $('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;
@@ -202,7 +207,7 @@ $('bkE').onclick=()=>{const j=JSON.stringify(S),b=$('bk');b.value=j;b.focus();b.
  try{navigator.clipboard.writeText(j).then(()=>bm('Copied to clipboard ✓'),()=>{})}catch(e){}
  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.download='dayflow-backup.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}};
 $('bkI').onclick=()=>{try{const d=JSON.parse($('bk').value.trim());if(!d||!Array.isArray(d.schedules))throw 0;
- S={schedules:d.schedules,log:d.log||{},snaps:d.snaps||{},events:d.events||[],notes:d.notes||[]};save();all();$('bk').value='';bm('Imported ✓')}catch(e){bm('That does not look like a DayFlow backup. Paste the full exported text.')}};
+ S={schedules:d.schedules,log:d.log||{},snaps:d.snaps||{},events:d.events||[],notes:d.notes||[],pin:d.pin};save();all();$('bk').value='';bm('Imported ✓')}catch(e){bm('That does not look like a DayFlow backup. Paste the full exported text.')}};
 const V=[["فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا","So truly, with hardship comes ease. Truly, with hardship comes ease.","Ash-Sharh 94:5–6"],
 ["أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ","Truly, it is in the remembrance of Allah that hearts find peace.","Ar-Ra’d 13:28"],
 ["لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا","Allah does not burden any soul beyond what it can bear.","Al-Baqarah 2:286"],
@@ -239,11 +244,19 @@ $('aS').onclick=()=>{LS('dayflow.user','');showAuth()};
 $('bkO').onclick=()=>{LS('dayflow.in','0');document.body.classList.add('lock');showAuth()};
 $('vGo').onclick=()=>{document.body.classList.remove('lock');show('')};
 let cur=null;
-function renderNotes(){$('nEd').style.display=cur?'block':'none';$('nLst').style.display=cur?'none':'block';
+function renderNotes(){
+ if(cur){const c=S.notes.find(x=>x.id===cur);if(!c||(c.lk&&!$('notes').classList.contains('on')))cur=null}
+ $('nEd').style.display=cur?'block':'none';$('nLst').style.display=cur?'none':'block';$('nQ').style.display=cur?'none':'block';
+ if(cur){const n=S.notes.find(x=>x.id===cur);$('nTi').value=n.t;$('nBd').value=n.b;$('nPn').style.opacity=n.p?1:.35;$('nLk').style.opacity=n.lk?1:.35;return}
+ const q=$('nQ').value.trim().toLowerCase();
+ const l=S.notes.filter(n=>!q||(n.t||'').toLowerCase().includes(q)||(!n.lk&&(n.b||'').toLowerCase().includes(q))).sort((a,b)=>(b.p?1:0)-(a.p?1:0)||b.u-a.u);
+ $('nLst').innerHTML='<button class="btn" id="nNew" style="width:100%;margin-bottom:14px">+ New note</button>'+(l.length?l.map(n=>'<div class="card" data-n="'+n.id+'" style="cursor:pointer"><h3 style="margin:0 0 4px">'+(n.p?'📌 ':'')+(n.lk?'🔒 ':'')+esc(n.t||'Untitled')+'</h3><div class="mu">'+(n.lk?'Locked note':esc((n.b||'').slice(0,90)))+'</div></div>').join(''):'<div class="empty">'+(q?'No notes match your search.':'No notes yet. Tap New note to start.')+'</div>')}
+$('nQ').oninput=renderNotes;
+function renderNotesOld(){$('nEd').style.display=cur?'block':'none';$('nLst').style.display=cur?'none':'block';
  if(cur){const n=S.notes.find(x=>x.id===cur);$('nTi').value=n.t;$('nBd').value=n.b;return}
  const l=S.notes.slice().sort((a,b)=>b.u-a.u);
  $('nLst').innerHTML='<button class="btn" id="nNew" style="width:100%;margin-bottom:14px">+ New note</button>'+(l.length?l.map(n=>'<div class="card" data-n="'+n.id+'" style="cursor:pointer"><h3 style="margin:0 0 4px">'+esc(n.t||'Untitled')+'</h3><div class="mu">'+esc((n.b||'').slice(0,90))+'</div></div>').join(''):'<div class="empty">No notes yet. Tap New note to start.</div>')}
-$('nLst').onclick=e=>{if(e.target.id==='nNew'){const n={id:uid(),t:'',b:'',u:Date.now()};S.notes.push(n);cur=n.id;save();renderNotes();$('nTi').focus();return}const c=e.target.closest('[data-n]');if(c){cur=c.dataset.n;renderNotes()}};
+$('nLst').onclick=e=>{if(e.target.id==='nNew'){const n={id:uid(),t:'',b:'',u:Date.now()};S.notes.push(n);cur=n.id;save();renderNotes();$('nTi').focus();return}const c=e.target.closest('[data-n]');if(c)openNote(c.dataset.n)};
 $('nTi').oninput=$('nBd').oninput=()=>{const n=S.notes.find(x=>x.id===cur);if(n){n.t=$('nTi').value;n.b=$('nBd').value;n.u=Date.now();save()}};
 const rdl=()=>{$('nDl').dataset.a='';$('nDl').textContent='🗑'};
 $('nBk').onclick=()=>{cur=null;rdl();renderNotes()};
@@ -276,6 +289,24 @@ $('aB').onclick=async()=>{const em=$('aN').value.trim(),p=$('aP').value,m=$('aM'
  b.disabled=false};
 $('aP').onkeydown=e=>{if(e.key==='Enter')$('aB').click()};
 $('bkO').onclick=async()=>{try{await fa.signOut()}catch(e){}authUser=null;document.body.classList.add('lock');showAuth()};
+const askPin=(t,m)=>new Promise(r=>{$('pT').textContent=t;$('pM').textContent=m||'';$('pI').value='';show('pinS');setTimeout(()=>$('pI').focus(),60);
+ const done=v=>{show('');r(v)};$('pOk').onclick=()=>done($('pI').value.trim());$('pCx').onclick=()=>done(null);$('pI').onkeydown=e=>{if(e.key==='Enter')$('pOk').click()}});
+async function openNote(id){const n=S.notes.find(x=>x.id===id);if(!n)return;
+ if(n.lk&&S.pin){let m='';for(;;){const p=await askPin('Enter your PIN to open this note',m);if(p===null)return;if(await hs(p,S.pin.s)===S.pin.h)break;m='Wrong PIN. Try again.'}}
+ cur=id;renderNotes()}
+$('nPn').onclick=()=>{const n=S.notes.find(x=>x.id===cur);if(n){n.p=!n.p;save();renderNotes()}};
+$('nLk').onclick=async()=>{const n=S.notes.find(x=>x.id===cur);if(!n)return;
+ if(n.lk){n.lk=false;save();renderNotes();return}
+ if(!S.pin){let m='You will need it to open locked notes. Do not forget it.',p;for(;;){p=await askPin('Create a PIN (4 to 8 numbers)',m);if(p===null)return;if(/^\d{4,8}$/.test(p))break;m='Use 4 to 8 numbers only.'}const s=uid();S.pin={s,h:await hs(p,s)}}
+ n.lk=true;save();cur=null;renderNotes()};
+function acInfo(){const u=fa&&fa.currentUser;$('acE').textContent=u?'Signed in as '+u.email:'Not signed in'}
+const reauth=async()=>{const u=fa.currentUser,p=$('acP').value;if(!p)throw{message:'Type your current password first.'};await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,p));return u};
+$('acC').onclick=async()=>{const m=$('acM'),np=$('acN').value;if(!fa||!fa.currentUser){m.textContent='Sign in first.';return}if(np.length<6){m.textContent='New password needs 6 or more characters.';return}
+ try{const u=await reauth();await u.updatePassword(np);$('acP').value=$('acN').value='';m.textContent='Password changed ✓'}catch(e){m.textContent=ERR[e.code]||e.message||'Could not change the password.'}};
+$('acD').onclick=async()=>{const b=$('acD'),m=$('acM');if(!fa||!fa.currentUser){m.textContent='Sign in first.';return}
+ if(b.dataset.a!=='1'){b.dataset.a='1';b.textContent='Tap again to delete everything';m.textContent='This permanently deletes your account, schedules and notes.';return}
+ try{const u=await reauth();await fdb.ref('users/'+u.uid).remove();await u.delete();try{localStorage.removeItem(KEY)}catch(e){}LS('dayflow.uid','');S={log:{},snaps:{},events:[],schedules:[],notes:[]};lj='';authUser=null;mode='up';cur=null;b.dataset.a='';b.textContent='Delete account';$('acP').value=$('acN').value='';m.textContent='';document.body.classList.add('lock');all();showAuth()}
+ catch(e){b.dataset.a='';b.textContent='Delete account';m.textContent=ERR[e.code]||e.message||'Could not delete the account.'}};
 setTimeout(()=>$('splash').classList.add('go'),1600);
 setTimeout(()=>{enter2();$('splash').classList.add('out')},3200);
 setTimeout(()=>$('splash').remove(),4100);
