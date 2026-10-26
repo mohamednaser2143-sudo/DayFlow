@@ -71,6 +71,7 @@ body.lock .wrap{display:none}
 </style></head><body class="lock">
 <div id="splash"><div class="lg"><span>Day</span><span class="fl">Flow</span></div><div id="water"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30Q150 0 300 30T600 30T900 30T1200 30V60H0Z"/></svg></div></div>
 <div class="scr" id="auth"><div class="card"><div class="logo" style="margin-bottom:6px">Day<span>Flow</span></div><h2 id="aT" style="margin-bottom:12px"></h2><input type="text" id="aN" placeholder="Email" inputmode="email" autocapitalize="none" autocomplete="email" spellcheck="false"><input type="password" id="aP" placeholder="Password (6+ characters)" autocomplete="current-password"><div class="mu" id="aM" style="margin-bottom:10px"></div><button class="btn" id="aB"></button><div class="mu" id="aS" style="margin-top:12px;text-align:center;cursor:pointer"></div><div class="mu" id="aF" style="margin-top:10px;text-align:center;cursor:pointer">Forgot password?</div></div></div>
+<div class="scr" id="tour"><div class="card" style="text-align:center"><div id="tE" style="font-size:56px"></div><h2 id="tH" style="margin:10px 0 8px"></h2><div id="tP" class="mu" style="font-size:16px;line-height:1.5;margin-bottom:16px"></div><div id="tD" style="margin-bottom:16px"></div><button class="btn" id="tN">Next</button><div class="mu" id="tS" style="margin-top:12px;cursor:pointer">Skip</div></div></div>
 <div class="scr" id="pinS"><div class="card"><h3 id="pT" style="margin-bottom:12px"></h3><input type="password" id="pI" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off"><div class="mu" id="pM" style="margin-bottom:10px"></div><button class="btn" id="pOk">OK</button><div class="mu" id="pCx" style="margin-top:12px;text-align:center;cursor:pointer">Cancel</div></div></div>
 <div class="scr" id="verse"><div class="card vc"><div class="mu">✦ Verse of the day ✦</div><div id="vAr" dir="rtl" lang="ar"></div><div id="vEn"></div><div class="mu" id="vRef" style="margin-bottom:16px"></div><button class="btn" id="vGo">Continue</button></div></div>
 <div class="wrap">
@@ -93,7 +94,7 @@ body.lock .wrap{display:none}
  <div class="card"><h3>Account</h3><div class="mu" id="acE" style="margin-bottom:10px"></div>
   <input type="password" id="acP" placeholder="Current password" autocomplete="current-password" style="width:100%;margin-bottom:8px">
   <input type="password" id="acN" placeholder="New password (6+ characters)" autocomplete="new-password" style="width:100%;margin-bottom:10px">
-  <div class="row" style="margin:0"><button class="btn" id="acC">Change password</button><button class="btn" id="acD" style="background:#d64545;color:#fff">Delete account</button></div><div class="mu" id="acM" style="margin-top:8px"></div></div>
+  <div class="row" style="margin:0"><button class="btn" id="acC">Change password</button><button class="btn" id="acD" style="background:#d64545;color:#fff">Delete account</button></div><div class="mu" id="acM" style="margin-top:8px"></div><div class="mu" id="tourAgain" style="margin-top:10px;cursor:pointer;text-decoration:underline">Show the tour again</div></div>
 </section>
 
 <section id="cal">
@@ -132,23 +133,28 @@ function chips(el,cls,on,cb,all){el.innerHTML=DN.map((d,i)=>'<button class="chip
 function drawChips(){}
 function renderToday(){
  const n=lnow(),today=ds(n),wd=n.getDay();
- const list=S.schedules.filter(s=>s.days.includes(wd)).flatMap(s=>s.items).sort(byT);
+ const alls=S.schedules.flatMap(s=>s.items),skip=(S.skip||{})[today]||[],mv=(S.moves||{})[today]||[];
+ const list=[...new Map([...S.schedules.filter(s=>s.days.includes(wd)).flatMap(s=>s.items),...alls.filter(x=>mv.includes(x.id))].map(x=>[x.id,x])).values()].filter(x=>!skip.includes(x.id)).sort(byT);
  S.snaps[today]=list.map(({id,time,text})=>({id,time,text}));
  const dn=S.log[today]||{};const done=list.filter(t=>dn[t.id]).length;
  $('tTitle').textContent=long(n);
  $('tSub').textContent=list.length?done+' of '+list.length+' done'+(done===list.length?' – nice work! 🎉':''):'Nothing scheduled today';
  $('tBar').style.width=(list.length?done/list.length*100:0)+'%';
- $('tList').innerHTML=list.length?list.map(t=>{const sb=t.subs||[],c=sb.filter(b=>dn[b.id]).length;return '<div class="tw"><div class="trow"><label class="task'+(dn[t.id]?' done':'')+'"><input type="checkbox" data-id="'+t.id+'"'+(dn[t.id]?' checked':'')+'><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span></label>'+(sb.length?'<button class="ghost tg" data-tg="'+t.id+'">'+c+'/'+sb.length+' '+(open[t.id]?'▴':'▾')+'</button>':'')+'</div>'+(sb.length&&open[t.id]?'<div class="subs">'+sb.map(b=>'<label class="sub'+(dn[b.id]?' done':'')+'"><input type="checkbox" data-id="'+b.id+'"'+(dn[b.id]?' checked':'')+'><span>'+esc(b.text)+'</span></label>').join('')+'</div>':'')+'</div>'}).join(''):'<div class="empty">No schedule is assigned to today. Create one in the Schedules tab and pick this day.</div>';
+ $('tList').innerHTML=list.length?list.map(t=>{const sb=t.subs||[],c=sb.filter(b=>dn[b.id]).length;return '<div class="tw"><div class="trow"><label class="task'+(dn[t.id]?' done':'')+'"><input type="checkbox" data-id="'+t.id+'"'+(dn[t.id]?' checked':'')+'><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span></label>'+(sb.length?'<button class="ghost tg" data-tg="'+t.id+'">'+c+'/'+sb.length+' '+(open[t.id]?'▴':'▾')+'</button>':'')+(dn[t.id]?'':'<button class="ghost tg" data-lt="'+t.id+'" aria-label="Do this later">Later ›</button>')+'</div>'+(sb.length&&open[t.id]?'<div class="subs">'+sb.map(b=>'<label class="sub'+(dn[b.id]?' done':'')+'"><input type="checkbox" data-id="'+b.id+'"'+(dn[b.id]?' checked':'')+'><span>'+esc(b.text)+'</span></label>').join('')+'</div>':'')+'</div>'}).join(''):'<div class="empty">No schedule is assigned to today. Create one in the Schedules tab and pick this day.</div>';
  const ev=S.events.filter(e=>e.date===today).sort(byT);
  $('tEvCard').style.display=ev.length?'block':'none';
  $('tEv').innerHTML=ev.map(e=>'<div class="ev"><span class="t">'+f12(e.time)+'</span><span class="x">'+esc(e.title)+'</span></div>').join('');
  save();
 }
 const srow=(s,t)=>{const o=sopen[t.id],n=(t.subs||[]).length;return '<div class="tw"><div class="task"><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span><button class="ghost tg" data-sg="'+t.id+'">'+(n?n+' steps ':'steps ')+(o?'▴':'▾')+'</button><button class="ghost" data-i="'+t.id+'" data-s="'+s.id+'" aria-label="Delete task">✕</button></div>'+(o?'<div class="subs">'+(t.subs||[]).map(b=>'<div class="sub" style="cursor:default"><span style="flex:1">'+esc(b.text)+'</span><button class="ghost" data-bi="'+b.id+'" data-s="'+s.id+'" data-t="'+t.id+'" aria-label="Delete step">✕</button></div>').join('')+'<div class="row" style="margin:6px 0 0"><input type="text" placeholder="Add a step (e.g. drink water)" maxlength="60" data-bx="'+t.id+'"><button class="btn" data-ba="'+t.id+'">Add</button></div></div>':'')+'</div>'};
+let edT=null,edB=null;
+const srow2=(s,t)=>{const o=sopen[t.id],n=(t.subs||[]).length;
+ if(edT===t.id)return '<div class="tw"><div class="row" style="margin:10px 0"><input type="time" value="'+t.time+'" data-et="'+t.id+'"><input type="text" value="'+esc(t.text)+'" maxlength="80" data-ex="'+t.id+'"><button class="btn" data-es="'+t.id+'">Save</button><button class="ghost" data-ec="1" aria-label="Cancel">✕</button></div></div>';
+ return '<div class="tw"><div class="task"><span class="t">'+f12(t.time)+'</span><span class="x">'+esc(t.text)+'</span><button class="ghost tg" data-sg="'+t.id+'">'+(n?n+' steps ':'steps ')+(o?'▴':'▾')+'</button><button class="ghost" data-ed="'+t.id+'" aria-label="Edit task">✎</button><button class="ghost" data-i="'+t.id+'" data-s="'+s.id+'" aria-label="Delete task">✕</button></div>'+(o?'<div class="subs">'+(t.subs||[]).map(b=>edB===b.id?'<div class="row" style="margin:4px 0"><input type="text" value="'+esc(b.text)+'" maxlength="60" data-bx2="'+b.id+'"><button class="btn" data-bs="'+b.id+'" data-t="'+t.id+'">Save</button><button class="ghost" data-ec="1" aria-label="Cancel">✕</button></div>':'<div class="sub" style="cursor:default"><span style="flex:1">'+esc(b.text)+'</span><button class="ghost" data-be="'+b.id+'" aria-label="Edit step">✎</button><button class="ghost" data-bi="'+b.id+'" data-s="'+s.id+'" data-t="'+t.id+'" aria-label="Delete step">✕</button></div>').join('')+'<div class="row" style="margin:6px 0 0"><input type="text" placeholder="Add a step (e.g. drink water)" maxlength="60" data-bx="'+t.id+'"><button class="btn" data-ba="'+t.id+'">Add</button></div></div>':'')+'</div>'};
 function renderSched(){
  $('sList').innerHTML=S.schedules.length?S.schedules.map(s=>'<div class="card"><div class="hd" style="cursor:default"><h3 style="margin:0">'+esc(s.name)+'</h3><button class="ghost" data-dels="'+s.id+'" aria-label="Delete schedule">🗑</button></div>'+
  '<div class="mu" style="margin:10px 0 6px">Applies to</div><div class="chips">'+DN.map((d,i)=>'<button class="chip'+(s.days.includes(i)?' on':'')+'" data-s="'+s.id+'" data-d="'+i+'">'+d+'</button>').join('')+'</div>'+
- (s.items.length?s.items.slice().sort(byT).map(t=>srow(s,t)).join(''):'<div class="mu" style="padding:8px 0">No tasks yet.</div>')+
+ (s.items.length?s.items.slice().sort(byT).map(t=>srow2(s,t)).join(''):'<div class="mu" style="padding:8px 0">No tasks yet.</div>')+
  '<div class="row" style="margin:10px 0 0"><input type="time" value="09:00" data-ti="'+s.id+'"><input type="text" placeholder="Add a task" maxlength="80" data-tx="'+s.id+'"><button class="btn" data-add="'+s.id+'">Add</button></div></div>').join(''):'<div class="card empty">No schedules yet. Create one above.</div>';
 }
 function renderSchedOld(){
@@ -177,7 +183,8 @@ function clock(){const n=new Date();$('clock').innerHTML=n.toLocaleTimeString([]
 
 $('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;
  document.querySelectorAll('nav button,section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$(b.dataset.t).classList.add('on');all()};
-$('tList').onclick=e=>{const b=e.target.closest('[data-tg]');if(b){open[b.dataset.tg]=!open[b.dataset.tg];renderToday()}};
+$('tList').onclick=e=>{const b=e.target.closest('[data-tg]');if(b){open[b.dataset.tg]=!open[b.dataset.tg];renderToday();return}
+ const l=e.target.closest('[data-lt]');if(l){const id=l.dataset.lt,td=ds(lnow()),tm=ds(new Date(lnow().getTime()+864e5));S.skip=S.skip||{};S.moves=S.moves||{};(S.skip[td]=S.skip[td]||[]).push(id);S.moves[tm]=S.moves[tm]||[];if(!S.moves[tm].includes(id))S.moves[tm].push(id);save();renderToday();$('tSub').textContent='Moved to tomorrow ✓'}};
 $('tList').onchange=e=>{const id=e.target.dataset.id;if(!id)return;const t=ds(lnow());S.log[t]=S.log[t]||{};const L=S.log[t],items=S.schedules.flatMap(s=>s.items),main=items.find(x=>x.id===id);
  if(main){if(e.target.checked&&(main.subs||[]).some(b=>!L[b.id])){open[id]=true;renderToday();$('tSub').textContent='Check all the steps first, then tick this one.';return}}
  else if(!e.target.checked){const p=items.find(x=>(x.subs||[]).some(b=>b.id===id));if(p)L[p.id]=false}
@@ -189,6 +196,11 @@ $('sList').onclick=e=>{const b=e.target.closest('button');if(!b)return;const D=b
  if(D.add)return addItem(D.add);
  if(D.sg){sopen[D.sg]=!sopen[D.sg];return renderSched()}
  if(D.ba)return addSub(D.ba);
+ if(D.ed){edT=D.ed;edB=null;return renderSched()}
+ if(D.be){edB=D.be;edT=null;return renderSched()}
+ if(D.ec){edT=edB=null;return renderSched()}
+ if(D.es){const t=S.schedules.flatMap(x=>x.items).find(x=>x.id===D.es),tm=document.querySelector('[data-et="'+D.es+'"]').value,tx=document.querySelector('[data-ex="'+D.es+'"]').value.trim();if(t&&tm&&tx){t.time=tm;t.text=tx;edT=null;save();all()}return}
+ if(D.bs){const t=S.schedules.flatMap(x=>x.items).find(x=>x.id===D.t),b=t&&(t.subs||[]).find(x=>x.id===D.bs),v=document.querySelector('[data-bx2="'+D.bs+'"]').value.trim();if(b&&v){b.text=v;edB=null;save();all()}return}
  if(D.bi){const t=s.items.find(x=>x.id===D.t);t.subs=t.subs.filter(x=>x.id!==D.bi);save();all();return}
  if(D.dels)S.schedules=S.schedules.filter(x=>x.id!==D.dels);
  else if(D.i)s.items=s.items.filter(t=>t.id!==D.i);
@@ -207,7 +219,7 @@ $('bkE').onclick=()=>{const j=JSON.stringify(S),b=$('bk');b.value=j;b.focus();b.
  try{navigator.clipboard.writeText(j).then(()=>bm('Copied to clipboard ✓'),()=>{})}catch(e){}
  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.download='dayflow-backup.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}};
 $('bkI').onclick=()=>{try{const d=JSON.parse($('bk').value.trim());if(!d||!Array.isArray(d.schedules))throw 0;
- S={schedules:d.schedules,log:d.log||{},snaps:d.snaps||{},events:d.events||[],notes:d.notes||[],pin:d.pin};save();all();$('bk').value='';bm('Imported ✓')}catch(e){bm('That does not look like a DayFlow backup. Paste the full exported text.')}};
+ S={schedules:d.schedules,log:d.log||{},snaps:d.snaps||{},events:d.events||[],notes:d.notes||[],pin:d.pin,skip:d.skip||{},moves:d.moves||{},tour:d.tour};save();all();$('bk').value='';bm('Imported ✓')}catch(e){bm('That does not look like a DayFlow backup. Paste the full exported text.')}};
 const V=[["فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا","So truly, with hardship comes ease. Truly, with hardship comes ease.","Ash-Sharh 94:5–6"],
 ["أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ","Truly, it is in the remembrance of Allah that hearts find peace.","Ar-Ra’d 13:28"],
 ["لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا","Allah does not burden any soul beyond what it can bear.","Al-Baqarah 2:286"],
@@ -242,7 +254,7 @@ $('aB').onclick=async()=>{const u=U(),p=$('aP').value;
  LS('dayflow.in','1');showVerse()};
 $('aS').onclick=()=>{LS('dayflow.user','');showAuth()};
 $('bkO').onclick=()=>{LS('dayflow.in','0');document.body.classList.add('lock');showAuth()};
-$('vGo').onclick=()=>{document.body.classList.remove('lock');show('')};
+$('vGo').onclick=()=>{document.body.classList.remove('lock');show('');if(!S.tour)showTour()};
 let cur=null;
 function renderNotes(){
  if(cur){const c=S.notes.find(x=>x.id===cur);if(!c||(c.lk&&!$('notes').classList.contains('on')))cur=null}
@@ -307,6 +319,14 @@ $('acD').onclick=async()=>{const b=$('acD'),m=$('acM');if(!fa||!fa.currentUser){
  if(b.dataset.a!=='1'){b.dataset.a='1';b.textContent='Tap again to delete everything';m.textContent='This permanently deletes your account, schedules and notes.';return}
  try{const u=await reauth();await fdb.ref('users/'+u.uid).remove();await u.delete();try{localStorage.removeItem(KEY)}catch(e){}LS('dayflow.uid','');S={log:{},snaps:{},events:[],schedules:[],notes:[]};lj='';authUser=null;mode='up';cur=null;b.dataset.a='';b.textContent='Delete account';$('acP').value=$('acN').value='';m.textContent='';document.body.classList.add('lock');all();showAuth()}
  catch(e){b.dataset.a='';b.textContent='Delete account';m.textContent=ERR[e.code]||e.message||'Could not delete the account.'}};
+const TOUR=[['📅','Build your schedules','Open Schedules, create a schedule, add your tasks with times, then pick the days it applies to.'],['✅','Check off your day','Today shows your tasks in time order. If a task has steps, tick all the steps first. Tap Later to move a task to tomorrow.'],['📒','Calendar, notes and history','Add events on the calendar, keep notes you can pin and lock, and look back at past days in History.'],['🌙','A fresh day every night','Your checklist resets at 12:30 AM. Everything is saved to your account, so it works on any device you sign in on.']];
+let ti=0;
+function drawTour(){const t=TOUR[ti];$('tE').textContent=t[0];$('tH').textContent=t[1];$('tP').textContent=t[2];$('tD').innerHTML=TOUR.map((_,i)=>'<i style="display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 3px;background:'+(i===ti?'var(--ac)':'var(--bd)')+'"></i>').join('');$('tN').textContent=ti===TOUR.length-1?'Get started':'Next'}
+function showTour(){ti=0;drawTour();show('tour')}
+function endTour(){S.tour=1;save();show('')}
+$('tN').onclick=()=>{if(ti<TOUR.length-1){ti++;drawTour()}else endTour()};
+$('tS').onclick=endTour;
+$('tourAgain').onclick=showTour;
 setTimeout(()=>$('splash').classList.add('go'),1600);
 setTimeout(()=>{enter2();$('splash').classList.add('out')},3200);
 setTimeout(()=>$('splash').remove(),4100);
