@@ -68,6 +68,20 @@ body.lock .wrap{display:none}
 @keyframes wv{to{transform:translateX(-50%)}}
 #splash.go .lg{transform:scale(6);opacity:0}#splash.go #water{transform:translateY(-8%)}
 .vc{text-align:center}#vAr{font:30px/2 Amiri,"Noto Naskh Arabic","Geeza Pro",serif;margin:14px 0 10px}#vEn{font-size:18px;margin-bottom:8px}
+.vs{position:relative;height:214px;overflow:hidden;text-align:left;font-size:14px;background:var(--bg);border:1px solid var(--bd);border-radius:14px;padding:10px;margin:12px 0}
+.mr{display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--card);border:1px solid var(--bd);border-radius:10px;margin-bottom:6px;opacity:0;animation:pop .45s forwards}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mk{width:18px;height:18px;flex:none;border:2px solid var(--bd);border-radius:5px;color:transparent;font-size:12px;line-height:14px;text-align:center}
+.mk.t{animation:tk .3s var(--d) forwards}@keyframes tk{to{background:var(--ok);border-color:var(--ok);color:#fff}}
+.st{animation:sk .3s var(--d) forwards}@keyframes sk{to{text-decoration:line-through;color:var(--mu)}}
+.ty{display:inline-block;overflow:hidden;white-space:nowrap;width:0;vertical-align:bottom;border-right:2px solid var(--ac);animation:ty 1.3s steps(10) .6s forwards}@keyframes ty{to{width:5.6em}}
+.ch{padding:3px 9px;border-radius:99px;border:1px solid var(--bd);font-size:12px;color:var(--mu)}.ch.on{animation:chon .3s var(--d) forwards}@keyframes chon{to{background:var(--ac);color:var(--act);border-color:var(--ac)}}
+.cu{position:absolute;z-index:3;font-size:24px;left:var(--x);top:var(--y);animation:cur .9s var(--d) both}@keyframes cur{to{transform:translate(var(--dx),var(--dy))}}
+.pbm{height:8px;background:var(--ac2);border-radius:9px;overflow:hidden;margin-bottom:8px}.pbm i{display:block;height:100%;width:0;background:var(--ok);animation:fl 4s 1s linear forwards}@keyframes fl{to{width:100%}}
+.away{animation:pop .45s forwards,aw .6s 2.3s forwards}@keyframes aw{to{opacity:0;transform:translateX(60px)}}
+@keyframes tap{50%{transform:scale(.93)}}
+.vseg{display:flex;gap:4px;margin-bottom:8px}.vseg b{flex:1;height:4px;border-radius:4px;background:var(--bd);overflow:hidden}.vseg b i{display:block;height:100%;width:0;background:var(--ac)}.vseg b.d i{width:100%}.vseg b.c i{animation:fl 6s linear forwards}
+.pz *{animation-play-state:paused!important}
 </style></head><body class="lock">
 <div id="splash"><div class="lg"><span>Day</span><span class="fl">Flow</span></div><div id="water"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30Q150 0 300 30T600 30T900 30T1200 30V60H0Z"/></svg></div></div>
 <div class="scr" id="auth"><div class="card"><div class="logo" style="margin-bottom:6px">Day<span>Flow</span></div><h2 id="aT" style="margin-bottom:12px"></h2><input type="text" id="aN" placeholder="Email" inputmode="email" autocapitalize="none" autocomplete="email" spellcheck="false"><input type="password" id="aP" placeholder="Password (6+ characters)" autocomplete="current-password"><div class="mu" id="aM" style="margin-bottom:10px"></div><button class="btn" id="aB"></button><div class="mu" id="aS" style="margin-top:12px;text-align:center;cursor:pointer"></div><div class="mu" id="aF" style="margin-top:10px;text-align:center;cursor:pointer">Forgot password?</div></div></div>
@@ -327,6 +341,30 @@ function endTour(){S.tour=1;save();show('')}
 $('tN').onclick=()=>{if(ti<TOUR.length-1){ti++;drawTour()}else endTour()};
 $('tS').onclick=endTour;
 $('tourAgain').onclick=showTour;
+const cu=(x,y,dx,dy,d)=>'<div class="cu" style="--x:'+x+';--y:'+y+';--dx:'+dx+';--dy:'+dy+';--d:'+d+'s">👆</div>';
+const row=(t,x,d)=>'<div class="mr" style="animation-delay:'+d+'s"><b style="color:var(--ac);min-width:62px">'+t+'</b>'+x+'</div>';
+const chk=(t,x,d)=>'<span class="mk t" style="--d:'+d+'s">✓</span><b style="color:var(--ac);min-width:62px">'+t+'</b><span class="st" style="--d:'+d+'s">'+x+'</span>';
+const SC=[
+['Create a schedule','Open Schedules, name it, and tap Create.',()=>'<div class="mr" style="animation-delay:.1s"><span class="mu">Schedule name</span></div><div class="mr" style="animation-delay:.3s;border-color:var(--ac)"><span class="ty">School day</span></div><div class="mr" style="justify-content:center;background:var(--ac);color:var(--act);font-weight:700;animation:pop .4s .5s forwards,tap .5s 2.5s">Create</div><div class="mr" style="animation-delay:3.2s"><b>School day</b><span class="mu"> · 0 tasks</span></div>'+cu('85%','165px','-120px','-50px',1.6)],
+['Add a task','Pick a time, type the task, and tap Add. Repeat for each task.',()=>'<div class="mr" style="animation-delay:.1s"><span class="mu">Add a task</span></div><div class="mr" style="animation-delay:.3s;gap:6px"><b style="border:1px solid var(--ac);border-radius:8px;padding:3px 8px;color:var(--ac)">7:00 AM</b><span class="ty">Wake up</span><span style="margin-left:auto;background:var(--ac);color:var(--act);font-weight:700;border-radius:8px;padding:4px 12px;animation:tap .5s 2.4s">Add</span></div>'+row('7:00 AM','Wake up',3)+'<div class="mr" style="animation-delay:3.6s"><span class="mu">Now add the next one…</span></div>'+cu('85%','150px','-30px','-85px',1.4)],
+['Pick the days','Tap the days this schedule applies to.',()=>row('7:00 AM','Wake up',.2)+row('8:30 AM','School',.9)+row('4:40 PM','Homework',1.6)+'<div class="mr" style="animation-delay:2.3s;gap:5px;flex-wrap:wrap"><span class="mu" style="width:100%">Applies to</span>'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d,i)=>'<span class="ch'+(i>0&&i<6?' on':'')+'" style="--d:'+(3+i*.35)+'s">'+d+'</span>').join('')+'</div>'],
+['Check off your day','Today shows your tasks in order. Tick them as you go.',()=>'<div class="pbm"><i></i></div>'+[['7:00 AM','Wake up',1],['8:30 AM','School',2.2],['4:40 PM','Homework',3.4]].map(a=>'<div class="mr" style="animation-delay:'+(a[2]*.1)+'s">'+chk(a[0],a[1],a[2])+'</div>').join('')],
+['Steps under a task','Tap steps, tick every step, then tick the task.',()=>'<div class="mr" style="animation-delay:.1s">'+chk('7:00 AM','Wake up',4.4)+'<span class="mu" style="margin-left:auto">3 steps ▾</span></div><div style="padding-left:30px">'+['Drink water','Brush teeth','Make bed'].map((s,i)=>'<div class="mr" style="animation-delay:'+(.8+i*.2)+'s"><span class="mk t" style="--d:'+(1.8+i*.9)+'s">✓</span><span class="st" style="--d:'+(1.8+i*.9)+'s">'+s+'</span></div>').join('')+'</div>'],
+['Not today? Tap Later','Move a task to tomorrow without changing your schedule.',()=>row('4:40 PM','Homework',.1)+'<div class="mr away" style="animation-delay:.3s,2.3s"><b style="color:var(--ac);min-width:62px">6:00 PM</b>Read<span style="margin-left:auto;color:var(--ac);font-weight:700">Later ›</span></div><div class="mr" style="animation-delay:3.1s;justify-content:center;color:var(--ok);font-weight:700">Moved to tomorrow ✓</div>'+cu('85%','150px','-70px','-60px',1.2)],
+['Calendar and notes','Add events, and keep notes you can pin, search and lock.',()=>'<div style="display:flex;gap:8px"><div class="mr" style="flex:1;display:block;animation-delay:.2s"><b>Calendar</b><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px">'+Array.from({length:14},(_,i)=>'<span style="aspect-ratio:1;border-radius:5px;background:var(--bg);text-align:center;font-size:10px;'+(i===9?'animation:chon .3s 1.6s forwards':'')+'">'+(i+1)+'</span>').join('')+'</div></div><div style="flex:1"><div class="mr" style="animation-delay:.9s">📌 <b>Plans</b></div><div class="mr" style="animation-delay:1.6s">🔒 <b>Private</b></div><div class="mr" style="animation-delay:2.3s"><span class="mu">Search notes…</span></div></div></div>'],
+['History and a fresh day','Past days are saved, and a new day starts at 12:30 AM.',()=>'<div class="mr" style="animation-delay:.1s;display:block"><b>History</b>'+[100,60,85].map((w,i)=>'<div class="pbm" style="margin:7px 0 0"><i style="animation:fl 1.2s '+(.6+i*.7)+'s linear forwards;max-width:'+w+'%"></i></div>').join('')+'</div><div class="mr" style="animation-delay:3s;justify-content:center">🌙 12:30 AM · a fresh day starts</div>']];
+const DUR=6000;let vi=0,vt=null,vr=DUR,v0=0,vp=false;
+function vDraw(){const s=SC[vi];$('vst').innerHTML=s[2]();$('vh').textContent=s[0];$('vc').textContent=s[1];
+ $('vseg').innerHTML=SC.map((_,i)=>'<b class="'+(i<vi?'d':i===vi?'c':'')+'"><i></i></b>').join('');
+ $('vnx').textContent=vi===SC.length-1?'Get started':'Next ›';$('vbk').style.visibility=vi?'visible':'hidden';
+ vr=DUR;v0=Date.now();clearTimeout(vt);if(!vp)vt=setTimeout(vNext,vr)}
+function vNext(){if(vi<SC.length-1){vi++;vDraw()}else{clearTimeout(vt);endTour()}}
+function showTour(){vi=0;vp=false;$('tour').classList.remove('pz');
+ $('tour').firstElementChild.innerHTML='<div class="vseg" id="vseg"></div><h2 id="vh" style="margin:4px 0 2px"></h2><div id="vc" class="mu"></div><div class="vs" id="vst"></div><div style="display:flex;gap:8px"><button class="btn" id="vbk" style="flex:1;background:var(--ac2);color:var(--ac)">‹ Back</button><button class="btn" id="vpz" style="flex:0 0 56px;background:var(--ac2);color:var(--ac)">⏸</button><button class="btn" id="vnx" style="flex:2">Next ›</button></div><div class="mu" id="vsk" style="margin-top:12px;cursor:pointer;text-align:center">Skip</div>';
+ $('vbk').onclick=()=>{if(vi>0){vi--;vDraw()}};
+ $('vnx').onclick=vNext;$('vsk').onclick=()=>{clearTimeout(vt);endTour()};
+ $('vpz').onclick=()=>{vp=!vp;$('tour').classList.toggle('pz',vp);$('vpz').textContent=vp?'▶':'⏸';if(vp){clearTimeout(vt);vr-=Date.now()-v0}else{v0=Date.now();vt=setTimeout(vNext,vr)}};
+ vDraw();show('tour')}
 setTimeout(()=>$('splash').classList.add('go'),1600);
 setTimeout(()=>{enter2();$('splash').classList.add('out')},3200);
 setTimeout(()=>$('splash').remove(),4100);
